@@ -10,6 +10,10 @@ class Ui_Widget(object):
         Widget.setObjectName("Widget")
         Widget.resize(800, 600)
 
+        self.widget = QtWidgets.QWidget(Widget)
+        self.widget.setGeometry(QtCore.QRect(30, 40, 741, 541))
+        self.widget.setObjectName("widget")
+
         self.xLineEdit = QtWidgets.QLineEdit(Widget)
         self.xLineEdit.setGeometry(QtCore.QRect(30, 40, 71, 41))
         self.xLineEdit.setObjectName("xLineEdit")
@@ -24,9 +28,14 @@ class Ui_Widget(object):
         self.AddPointButton.clicked.connect(self.on_add_point_button_clicked)
 
         self.GetClustersButton = QtWidgets.QPushButton(Widget)
-        self.GetClustersButton.setGeometry(QtCore.QRect(120, 120, 181, 61))
+        self.GetClustersButton.setGeometry(QtCore.QRect(120, 120, 80, 61))
         self.GetClustersButton.setObjectName("GetClustersButton")
-        self.GetClustersButton.clicked.connect(self.on_get_clusters_button_clicked)
+        self.GetClustersButton.clicked.connect(self.on_euclidian_button_clicked)
+
+        self.ChebyshevButton = QtWidgets.QPushButton(Widget)
+        self.ChebyshevButton.setGeometry(QtCore.QRect(220, 120, 80, 61))
+        self.ChebyshevButton.setObjectName("ChebyshevButton")
+        self.ChebyshevButton.clicked.connect(self.on_chebyshev_button_clicked)
 
         self.scrollArea = QtWidgets.QScrollArea(Widget)
         self.scrollArea.setGeometry(QtCore.QRect(340, 40, 421, 521))
@@ -59,7 +68,8 @@ class Ui_Widget(object):
         _translate = QtCore.QCoreApplication.translate
         Widget.setWindowTitle(_translate("Widget", "Widget"))
         self.AddPointButton.setText(_translate("Widget", "Add point"))
-        self.GetClustersButton.setText(_translate("Widget", "Get clusters"))
+        self.GetClustersButton.setText(_translate("Widget", "Euclidian"))
+        self.ChebyshevButton.setText(_translate("Widget", "Chebyshev"))
 
     def on_add_point_button_clicked(self):
         x = self.xLineEdit.text()
@@ -68,10 +78,7 @@ class Ui_Widget(object):
         self.xLineEdit.clear()
         self.yLineEdit.clear()
 
-    def on_get_clusters_button_clicked(self):
-        cluster_number = self.ClusterNumberLineEdit.text()
-        img_count, output = self.clf.get_clusters(int(cluster_number))
-
+    def show_clusters(self, img_count, output):
         formLayout = QFormLayout()
         groupBox = QGroupBox()
 
@@ -97,3 +104,17 @@ class Ui_Widget(object):
         label = QtWidgets.QLabel(output)
         lay.addWidget(label)
         lay.addStretch()
+
+    def on_euclidian_button_clicked(self):
+        cluster_number = self.ClusterNumberLineEdit.text()
+        img_count, output = self.clf.get_clusters(int(cluster_number), 'euclidean')
+        self.clf.clear_clusters()
+
+        self.show_clusters(img_count, output)
+
+    def on_chebyshev_button_clicked(self):
+        cluster_number = self.ClusterNumberLineEdit.text()
+        img_count, output = self.clf.get_clusters(int(cluster_number), 'chebyshev')
+        self.clf.clear_clusters()
+
+        self.show_clusters(img_count, output)

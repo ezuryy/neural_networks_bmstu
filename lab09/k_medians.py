@@ -13,6 +13,9 @@ class Point:
     def euclidean_distance(self, other):
         return np.sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
 
+    def chebyshev_distance(self, other):
+        return max(abs(self.x - other.x), abs(self.y - other.y))
+
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y and self.cluster == other.cluster
 
@@ -56,8 +59,14 @@ class ClusteriserKMedians:
                          for i in range(self.cluster_number)]
             point.cluster = np.argmin(distances)
 
+    def update_chebyshev_distance(self):
+        for point in self.points:
+            distances = [point.chebyshev_distance(self.curr_medians[i])
+                         for i in range(self.cluster_number)]
+            point.cluster = np.argmin(distances)
+
     def show_current_state(self, start=False):
-        markers = ['o', 'v', 'd', 's']
+        markers = ['o', 'v', 'D', 's']
         fig, ax = plt.subplots(figsize=(4, 4))
         if start:
             print('start!')
@@ -68,11 +77,11 @@ class ClusteriserKMedians:
                 x_cl, y_cl = self.get_data_x_y_for_cluster(cluster)
                 ax.scatter(x_cl, y_cl, marker=markers[cluster], label='cluster ' + str(cluster))
         median_x, median_y = get_data_x_y_of_median(self.curr_medians)
-        ax.scatter(median_x, median_y, marker="D", label='cluster centers', c='red')
+        ax.scatter(median_x, median_y, marker="d", label='cluster centers', c='red')
         ax.grid()
         ax.legend()
 
-    def get_clusters(self, cl_num=2):
+    def get_clusters(self, cl_num=2, dist='euclidean'):
         self.cluster_number = cl_num
 
         cluster_idx = list(range(len(self.points)))
@@ -86,7 +95,11 @@ class ClusteriserKMedians:
         plt.savefig('report' + str(iteration) + '.png')
         while True:
             prev_medians = self.curr_medians.copy()
-            self.update_euclidean_distance()
+
+            if dist == 'euclidean':
+                self.update_euclidean_distance()
+            else:
+                self.update_chebyshev_distance()
 
             self.output += f'\nIteration #{iteration}\nCurrent state:\n'
             for p in self.points:
@@ -105,9 +118,12 @@ class ClusteriserKMedians:
 
         return iteration, self.output
 
-
-def count_euclidean_distance(median, point):
-    return [point.euclidean_distance(median[i]) for i in range(len(median))]
+    def clear_clusters(self):
+        for point in self.points:
+            point.cluster = -1
+        self.curr_medians = []
+        self.cluster_number = -1
+        self.output = ''
 
 
 def get_data_x_y_of_median(median):
@@ -128,4 +144,4 @@ if __name__ == '__main__':
     model.add_point(226, 253)
     model.add_point(315, 275)
     model.add_point(266, 297)
-    model.get_clusters(2)
+    model.get_clusters(2, 'chebyshev')
