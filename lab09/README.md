@@ -4,5 +4,5 @@
 ![screenshot](https://github.com/ezuryy/neural_networks_bmstu/blob/dev/lab09/screen1.png)
 
 ## Кластеризация точек с использованием расстояния Чебышёва
-![screenshot](https://github.com/ezuryy/neural_networks_bmstu/blob/dev/lab09/screen1.png)
+![screenshot](https://github.com/ezuryy/neural_networks_bmstu/blob/dev/lab09/screen2.png)
 
